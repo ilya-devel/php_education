@@ -1,0 +1,1 @@
+<p class="err-msg">{{ message }}<p>

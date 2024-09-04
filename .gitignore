@@ -1,1 +1,10 @@
+### DIRS ###
+
 .DS_Store
+cache/
+vendor/
+
+
+### FILES ###
+
+tmp.html

@@ -9,7 +9,7 @@ services:
     ports:
       - '80:80'
     volumes:
-      - ./code:/data/mysite.local
+      - ../sem5_homework:/data/mysite.local
     networks:
       - app-network
 
@@ -20,7 +20,7 @@ services:
     image: myapp/php
     container_name: app
     volumes:
-      - ./code:/data/mysite.local
+      - ../sem5_homework:/data/mysite.local
     networks:
       - app-network
 
