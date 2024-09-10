@@ -3,8 +3,10 @@
 .DS_Store
 cache/
 vendor/
+db/
 
 
 ### FILES ###
 
 tmp.html
+.env
