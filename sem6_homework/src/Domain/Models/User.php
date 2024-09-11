@@ -5,7 +5,8 @@ namespace Geekbrains\Application1\Domain\Models;
 use Geekbrains\Application1\Application\Application;
 use Geekbrains\Application1\Infrastructure\Storage;
 
-class User {
+class User
+{
 
     private ?int $idUser;
 
@@ -16,46 +17,60 @@ class User {
 
     private static string $storageAddress = '/storage/birthdays.txt';
 
-    public function __construct(string $name = null, string $lastName = null, int $birthday = null, int $id_user = null){
+    public function __construct(string $name = null, string $lastName = null, int $birthday = null, int $id_user = null)
+    {
         $this->userName = $name;
         $this->userLastName = $lastName;
         $this->userBirthday = $birthday;
         $this->idUser = $id_user;
     }
 
-    public function setUserId(int $id_user): void {
+    public function setUserId(int $id_user): void
+    {
         $this->idUser = $id_user;
     }
 
-    public function getUserId(): ?int {
+    public function getUserId(): ?int
+    {
         return $this->idUser;
     }
 
-    public function setName(string $userName) : void {
+    public function setName(string $userName): void
+    {
         $this->userName = $userName;
     }
 
-    public function setLastName(string $userLastName) : void {
+    public function setLastName(string $userLastName): void
+    {
         $this->userLastName = $userLastName;
     }
 
-    public function getUserName(): string {
+    public function getUserName(): string
+    {
         return $this->userName;
     }
 
-    public function getUserLastName(): string {
+    public function getUserLastName(): string
+    {
         return $this->userLastName;
     }
 
-    public function getUserBirthday(): int {
+    public function getUserBirthday(): int
+    {
         return $this->userBirthday;
     }
 
-    public function setBirthdayFromString(string $birthdayString) : void {
+    public function setBirthdayFromString(string $birthdayString): void
+    {
         $this->userBirthday = strtotime($birthdayString);
     }
+    public static function birthdayFromString(string $birthdayString): int
+    {
+        return strtotime($birthdayString);
+    }
 
-    public static function getAllUsersFromStorage(): array {
+    public static function getAllUsersFromStorage(): array
+    {
         $sql = "SELECT * FROM users";
 
         $handler = Application::$storage->get()->prepare($sql);
@@ -64,7 +79,7 @@ class User {
 
         $users = [];
 
-        foreach($result as $item){
+        foreach ($result as $item) {
             $user = new User($item['user_name'], $item['user_lastname'], $item['user_birthday_timestamp']);
             $users[] = $user;
         }
@@ -72,26 +87,28 @@ class User {
         return $users;
     }
 
-    public static function validateRequestData(): bool{
-        if(
+    public static function validateRequestData(): bool
+    {
+        if (
             isset($_GET['name']) && !empty($_GET['name']) &&
             isset($_GET['lastname']) && !empty($_GET['lastname']) &&
             isset($_GET['birthday']) && !empty($_GET['birthday'])
-        ){
+        ) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
-    public function setParamsFromRequestData(): void {
+    public function setParamsFromRequestData(): void
+    {
         $this->userName = $_GET['name'];
         $this->userLastName = $_GET['lastname'];
         $this->setBirthdayFromString($_GET['birthday']);
     }
 
-    public function saveToStorage(){
+    public function saveToStorage()
+    {
         $sql = "INSERT INTO users(user_name, user_lastname, user_birthday_timestamp) VALUES (:user_name, :user_lastname, :user_birthday)";
 
         $handler = Application::$storage->get()->prepare($sql);
@@ -102,7 +119,8 @@ class User {
         ]);
     }
 
-    public static function exists(int $id): bool{
+    public static function exists(int $id): bool
+    {
         $sql = "SELECT count(id_user) as user_count FROM users WHERE id_user = :id_user";
 
         $handler = Application::$storage->get()->prepare($sql);
@@ -112,21 +130,26 @@ class User {
 
         $result = $handler->fetchAll();
 
-        if(count($result) > 0 && $result[0]['user_count'] > 0){
+        if (count($result) > 0 && $result[0]['user_count'] > 0) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
-    public function updateUser(array $userDataArray, string $id): void{
+    public function updateUser(array $userDataArray, string $id): void
+    {
+        print_r($userDataArray);
         $sql = "UPDATE users SET ";
         $counter = 0;
-        foreach($userDataArray as $key => $value) {
-            $sql .= $key ." = :".$key;
+        foreach ($userDataArray as $key => $value) {
+            if ($key === 'birthday') {
+                $sql .= "user_birthday_timestamp=:" . $key;
+            } else {
+                $sql .= $key . " = :" . $key;
+            }
 
-            if($counter != count($userDataArray)-1) {
+            if ($counter != count($userDataArray) - 1) {
                 $sql .= ",";
             }
 
@@ -135,11 +158,13 @@ class User {
 
         $sql .= " WHERE id_user = :id_user";
 
+
         $handler = Application::$storage->get()->prepare($sql);
         $handler->execute(array_merge($userDataArray, ['id_user' => (string) $id]));
     }
 
-    public static function deleteFromStorage(int $user_id) : void {
+    public static function deleteFromStorage(int $user_id): void
+    {
         $sql = "DELETE FROM users WHERE id_user = :id_user";
 
         $handler = Application::$storage->get()->prepare($sql);

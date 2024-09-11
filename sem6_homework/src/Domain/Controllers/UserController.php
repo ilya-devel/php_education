@@ -64,6 +64,10 @@ class UserController {
                 $arrayData['user_lastname'] = $_GET['lastname'];
             }
 
+            if(isset($_GET['birthday']) && (int)($_GET['birthday'])) {
+                $arrayData['birthday'] = User::birthdayFromString($_GET['birthday']);
+            }
+
             $user->updateUser($arrayData, $user->getUserId());
         }
         else {
